@@ -7,6 +7,10 @@ from app.models import Menu
 def home():
 	return jsonify({ "status": "ok" })
 
+@app.route('/version')
+def version():
+    return jsonify({ "version": "1.0.1", "build": "assignment-ci-cd-v1" }), 200
+
 @app.route('/menu')
 def menu():
     today = Menu.query.first()
