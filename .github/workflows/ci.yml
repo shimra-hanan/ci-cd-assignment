@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD 
 
 on:
   push:
@@ -26,4 +26,22 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest
+        pytes
+      # your existing CI steps: checkout, install, run tests etc.
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: ${{ success() && github.ref == 'refs/heads/main' }}  # only if tests passed & main branch
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Push to staging branch
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch origin
+          git checkout -b staging
+          git push -f origin staging
